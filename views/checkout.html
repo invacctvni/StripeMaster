@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Buy Products</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://js.stripe.com/v3/"></script>
+
+  </head>
+  <body class="container">
+  <h1>Checkout</h1>
+      <div class="product">
+        <img
+          src="https://www.sees.com/dw/image/v2/AATS_PRD/on/demandware.static/-/Sites-sees-catalog/default/dw5a96c10e/images/all-year/classic-assorted-chocolates-95-candy-box-alt1.jpg?sw=1036&sh=1036"
+          alt="see's candy"
+          class="product_img"
+        />
+        <div class="description">
+          <h3>See's Candy</h3>
+<!--          <h4>&#8377 100.00</h4>-->
+          <h4>$ 100.00</h4>
+        </div>
+        <button type="button" class="button-85" id="btn">BUY</button>
+      </div>
+  </body>
+
+  <script type="text/javascript">
+    // Create an instance of the Stripe object with your publishable API key
+    var stripe = Stripe("pk_test_51LILdXEM3Fdgo87B2s61PDiIewOZMVXTwYkvoCOrvmnNlQJsQnWf04fe9JojKalcWIoMtLQUf2h9yCXnzUDrwglf00RyMDTsNL");
+    var checkoutButton = document.getElementById("btn");
+
+    checkoutButton.addEventListener("click", function () {
+      fetch("/payment", {
+        headers: {'Content-Type': 'application/json'},
+        method: "POST",
+        body: JSON.stringify({
+            "product": {
+                "name": "sea's candies",
+                "image": "https://www.sees.com/dw/image/v2/AATS_PRD/on/demandware.static/-/Sites-sees-catalog/default/dw5a96c10e/images/all-year/classic-assorted-chocolates-95-candy-box-alt1.jpg?sw=1036&sh=1036",
+                "quantity": 1,
+                "amount": 100
+            }})
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (session) {
+          return stripe.redirectToCheckout({ sessionId: session.id });
+        })
+        .then(function (result) {
+          // If redirectToCheckout fails due to a browser or network
+          // error, you should display the localized error message to your
+          // customer using error.message.
+          if (result.error) {
+            alert(result.error.message);
+          }
+        })
+        .catch(function (error) {
+          console.error("Error:", error);
+        });
+    });
+  </script>
+</html>
